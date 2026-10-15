@@ -1,27 +1,17 @@
-const BASE_URL = "https://api.github.com";
+const BASE_URL = 'https://api.github.com';
 
-export async function getGithubUser(userName) {
-  let response;
-
-  try {
-    response = await fetch(`${BASE_URL}/users/${encodeURIComponent(userName)}`);
-  } catch {
-    throw new Error("Ocorreu um erro ao buscar o perfil do usuário. Tente novamente.");
-  }
-
-  if (response.status === 404) {
-    throw new Error(
-      "Usuário não encontrado. Verifique o nome de usuário e tente novamente.",
-    );
-  }
-
+export async function fetchGithubUser(userName) {
+  const response = await fetch(`${BASE_URL}/users/${userName}`);
   if (!response.ok) {
-    throw new Error("Ocorreu um erro ao buscar o perfil do usuário. Tente novamente.");
+    throw new Error('Usuário não encontrado.');
   }
+  return await response.json();
+}
 
-  try {
+export async function fetchGithubUserRepos(userName) {
+    const response = await fetch(`${BASE_URL}/users/${userName}/repos?per_page=10&sort=created`);
+    if (!response.ok) {
+        throw new Error('Repositórios não encontrados.');
+    }
     return await response.json();
-  } catch {
-    throw new Error("Não foi possível ler os dados do perfil. Tente novamente.");
-  }
 }

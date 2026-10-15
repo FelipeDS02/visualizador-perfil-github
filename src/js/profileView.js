@@ -1,52 +1,46 @@
-function createElement(tagName, className, text) {
-  const element = document.createElement(tagName);
-  element.className = className;
+export function renderProfile(userData, userRepos, container) {
 
-  if (text) {
-    element.textContent = text;
-  }
+  const repositoriesHTML = userRepos && userRepos.length > 0 ? userRepos.map(repo => `
+    <a href="${repo.html_url}" target="_blank">
+        <div class="repository-card">    
+            <h3>${repo.name}</h3>
+            <div class="repository-stats">
+                <span>⭐Stars: ${repo.stargazers_count}</span>
+                <span>🍴 Forks: ${repo.forks_count}</span>
+                <span>👀 Watchers: ${repo.watchers_count}</span>
+                <span>💻 Language: ${repo.language || 'Não informada'}</span>
+            </div>
+        </div>
+    </a>
+    `).join('') : `<p>Nenhum repositório encontrado.</p>`;
 
-  return element;
-}
+  container.innerHTML = `
+    <div class="profile-card">
+      <img src="${userData.avatar_url}" alt="Avatar de ${
+    userData.name
+  }" class="profile-avatar">
+      <div class="profile-info">
+        <h2>${userData.name}</h2>
+        <p>${userData.bio || "Não possui bio cadastrada 😢."}</p>
+      </div>
+    </div>
 
-export function renderLoading(container) {
-  const loading = createElement("p", "loading", "Carregando...");
-  loading.setAttribute("role", "status");
-  container.replaceChildren(loading);
-}
+    <div class="profile-counters">
+        <div class="followers">
+            <h4>👥 Seguidores</h4>
+            <span>${userData.followers}</span>
+        </div>
+        <div class="following">
+            <h4>👥 Seguindo</h4>
+            <span>${userData.following}</span>
+        </div>
+    </div>
 
-export function renderProfile(container, userData) {
-  const profileCard = createElement("div", "profile-card");
-  const avatar = createElement("img", "profile-avatar");
-  const profileInfo = createElement("div", "profile-info");
-  const displayName = userData.name || userData.login;
-
-  avatar.src = userData.avatar_url;
-  avatar.alt = `Avatar de ${displayName}`;
-
-  profileInfo.append(
-    createElement("h2", "", displayName),
-    createElement("p", "", userData.bio || "Sem biografia disponível."),
-  );
-  profileCard.append(avatar, profileInfo);
-
-  const counters = createElement("div", "profile-counters");
-  const followers = createElement("div", "followers");
-  const following = createElement("div", "following");
-
-  followers.append(
-    createElement("h4", "", "Seguidores"),
-    createElement("span", "", String(userData.followers)),
-  );
-  following.append(
-    createElement("h4", "", "Seguindo"),
-    createElement("span", "", String(userData.following)),
-  );
-  counters.append(followers, following);
-
-  container.replaceChildren(profileCard, counters);
-}
-
-export function clearProfile(container) {
-  container.replaceChildren();
+    <div class="profile-repositories">
+        <h2>Repositórios</h2>
+        <div class="repositories">
+            ${repositoriesHTML}
+        </div>
+    </div>
+  `;
 }
